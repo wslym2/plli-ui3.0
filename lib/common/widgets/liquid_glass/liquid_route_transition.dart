@@ -60,8 +60,8 @@ class LiquidSpringPageTransitionsBuilder extends PageTransitionsBuilder {
 
     return SlideTransition(
       position: secondarySlide,
-      child: Transform.scale(
-        scale: secondaryScale.value,
+      child: ScaleTransition(
+        scale: secondaryScale,
         alignment: Alignment.centerRight,
         child: FadeTransition(
           opacity: secondaryFade,
