@@ -4,6 +4,7 @@ import 'dart:math' show max;
 
 import 'package:PiliPlus/common/widgets/button/toolbar_icon_button.dart';
 import 'package:PiliPlus/common/widgets/custom_icon.dart';
+import 'package:PiliPlus/common/widgets/liquid_glass/liquid_glass.dart';
 import 'package:PiliPlus/common/widgets/flutter/text_field/controller.dart'
     show RichTextType, RichTextEditingDeltaReplacement;
 import 'package:PiliPlus/common/widgets/flutter/text_field/text_field.dart';
@@ -94,8 +95,23 @@ class _ReplyPageState extends CommonRichTextPubPageState<ReplyPage> {
         child: Container(
           constraints: const BoxConstraints(maxWidth: 640),
           decoration: BoxDecoration(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-            color: theme.colorScheme.surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            color: theme.colorScheme.surface.withValues(alpha: 0.94),
+            border: Border(
+              top: BorderSide(
+                color: theme.brightness == Brightness.dark
+                    ? const Color(0x3380D8FF)
+                    : const Color(0x4D80E5FF),
+                width: 0.8,
+              ),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.15),
+                blurRadius: 20,
+                offset: const Offset(0, -4),
+              ),
+            ],
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -207,20 +223,61 @@ class _ReplyPageState extends CommonRichTextPubPageState<ReplyPage> {
               ),
             ),
             const Spacer(),
-            Obx(
-              () => FilledButton.tonal(
-                onPressed: enablePublish.value ? onPublishThrottle : null,
-                style: FilledButton.styleFrom(
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            Obx(() {
+              final canPublish = enablePublish.value;
+              final isDark = theme.brightness == Brightness.dark;
+              return LiquidPressable(
+                onTap: canPublish ? onPublishThrottle : null,
+                pressedScale: 0.91,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 240),
+                  curve: Curves.fastEaseInToSlowEaseOut,
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
+                    horizontal: 18,
+                    vertical: 8,
                   ),
-                  visualDensity: VisualDensity.compact,
+                  decoration: ShapeDecoration(
+                    shape: const StadiumBorder(),
+                    gradient: canPublish
+                        ? LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: isDark
+                                ? [const Color(0xFF80D8FF), const Color(0xFF0091EA)]
+                                : [const Color(0xFF007AFF), const Color(0xFF0051C7)],
+                          )
+                        : null,
+                    color: canPublish
+                        ? null
+                        : (isDark
+                            ? Colors.white.withValues(alpha: 0.08)
+                            : Colors.black.withValues(alpha: 0.05)),
+                    shadows: canPublish
+                        ? [
+                            BoxShadow(
+                              color: (isDark
+                                      ? const Color(0xFF80D8FF)
+                                      : const Color(0xFF007AFF))
+                                  .withValues(alpha: 0.35),
+                              blurRadius: 10,
+                              offset: const Offset(0, 3),
+                            ),
+                          ]
+                        : null,
+                  ),
+                  child: Text(
+                    '发送',
+                    style: TextStyle(
+                      color: canPublish
+                          ? Colors.white
+                          : (isDark ? Colors.white38 : Colors.black26),
+                      fontWeight: canPublish ? FontWeight.w700 : FontWeight.w500,
+                      fontSize: 14,
+                    ),
+                  ),
                 ),
-                child: const Text('发送'),
-              ),
-            ),
+              );
+            }),
           ],
         ),
       ),
