@@ -77,14 +77,8 @@ class Routes {
     GetPage(name: '/home', page: () => const HomePage()),
     // 热门
     GetPage(name: '/hot', page: () => const HotPage()),
-    // 视频详情：专属苹果 iOS 26 物理弹性深度展开转场
-    GetPage(
-      name: '/videoV',
-      page: () => const VideoDetailPageV(),
-      transition: Transition.rightToLeftWithFade,
-      curve: Curves.fastEaseInToSlowEaseOut,
-      transitionDuration: const Duration(milliseconds: 360),
-    ),
+    // 视频详情
+    GetPage(name: '/videoV', page: () => const VideoDetailPageV()),
     //
     GetPage(name: '/webview', page: () => const WebviewPage()),
     // 设置
