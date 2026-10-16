@@ -96,7 +96,7 @@ class _PrismRainbowLensPainter extends CustomPainter {
                 const Color(0x1A80E5FF),
               ],
         stops: const [0.0, 0.45, 1.0],
-      );
+      ).createShader(rect);
 
     // 水滴阴影
     final Path shadowPath = Path()..addRRect(rrect);

@@ -1,4 +1,5 @@
 import 'package:PiliPlus/common/widgets/custom_arc.dart';
+import 'package:PiliPlus/common/widgets/liquid_glass/liquid_glass.dart';
 import 'package:PiliPlus/utils/extension/theme_ext.dart';
 import 'package:PiliPlus/utils/platform_utils.dart';
 import 'package:material_ui/material_ui.dart';
@@ -76,12 +77,15 @@ class ActionItem extends StatelessWidget {
         onTapDown: _isThumbsUp ? (_) => onStartTriple!() : null,
         onTapUp: _isThumbsUp ? (_) => onCancelTriple!(true) : null,
         onTapCancel: _isThumbsUp ? onCancelTriple : null,
-        child: expand
-            ? Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [child, _buildText(theme)],
-              )
-            : child,
+        child: LiquidPressable(
+          pressedScale: 0.91,
+          child: expand
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [child, _buildText(theme)],
+                )
+              : child,
+        ),
       ),
     );
     return expand ? Expanded(child: child) : child;
