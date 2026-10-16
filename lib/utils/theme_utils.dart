@@ -117,15 +117,32 @@ abstract final class ThemeUtils {
           fontFamily: fontFamily,
           color: colorScheme.onSurface,
         ),
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(24)),
+        shape: RoundedRectangleBorder(
+          borderRadius: const BorderRadius.all(Radius.circular(24)),
+          side: BorderSide(
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.16)
+                : Colors.black.withValues(alpha: 0.06),
+            width: 0.8,
+          ),
         ),
-        backgroundColor: colorScheme.surface,
+        backgroundColor: isDark ? const Color(0xEB1E1E24) : const Color(0xF5FFFFFF),
+        elevation: 16,
+        shadowColor: Colors.black.withValues(alpha: isDark ? 0.45 : 0.12),
         constraints: const BoxConstraints(minWidth: 280, maxWidth: 420),
       ),
-      bottomSheetTheme: const BottomSheetThemeData(
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: isDark ? const Color(0xEB1E1E24) : const Color(0xF5FFFFFF),
+        elevation: 20,
+        shadowColor: Colors.black.withValues(alpha: isDark ? 0.45 : 0.12),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(26)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
+          side: BorderSide(
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.16)
+                : Colors.black.withValues(alpha: 0.06),
+            width: 0.8,
+          ),
         ),
       ),
       // ignore: deprecated_member_use

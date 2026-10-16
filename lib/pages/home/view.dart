@@ -42,10 +42,12 @@ class _HomePageState extends CommonPageState<HomePage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    final isDark = _colorScheme.brightness == Brightness.dark;
+
     Widget tabBar;
     if (_homeController.tabs.length > 1) {
       tabBar = Padding(
-        padding: const EdgeInsets.only(top: 4),
+        padding: const EdgeInsets.only(top: 2, bottom: 4),
         child: SizedBox(
           height: 42,
           width: double.infinity,
@@ -55,8 +57,32 @@ class _HomePageState extends CommonPageState<HomePage>
             isScrollable: true,
             dividerColor: Colors.transparent,
             dividerHeight: 0,
-            splashBorderRadius: Style.mdRadius,
             tabAlignment: TabAlignment.center,
+            // 苹果 iOS 26 晶体流体浮雕微药丸指示器
+            indicator: BoxDecoration(
+              color: isDark ? const Color(0x33FFFFFF) : Colors.white,
+              borderRadius: const BorderRadius.all(Radius.circular(16)),
+              border: Border.all(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.15)
+                    : Colors.black.withValues(alpha: 0.04),
+                width: 0.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.08),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            indicatorSize: TabBarIndicatorSize.tab,
+            indicatorPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+            labelColor: isDark ? Colors.white : Colors.black,
+            unselectedLabelColor: isDark ? const Color(0x99EBEBF5) : const Color(0xFF8E8E93),
+            labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+            unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14.5),
+            splashBorderRadius: const BorderRadius.all(Radius.circular(16)),
             onTap: (_) {
               feedBack();
               if (!_homeController.tabController.indexIsChanging) {
@@ -128,8 +154,8 @@ class _HomePageState extends CommonPageState<HomePage>
             opacity: showSearchBar ? 1 : 0,
             duration: const Duration(milliseconds: 300),
             child: AnimatedContainer(
-              curve: Curves.easeInOutCubicEmphasized,
-              duration: const Duration(milliseconds: 500),
+              curve: Curves.easeOutBack,
+              duration: const Duration(milliseconds: 400),
               height: showSearchBar ? Style.topBarHeight : 0,
               padding: padding,
               child: child,
@@ -146,7 +172,17 @@ class _HomePageState extends CommonPageState<HomePage>
   }
 
   Widget searchBar() {
-    const borderRadius = BorderRadius.all(Radius.circular(22));
+    final isDark = _colorScheme.brightness == Brightness.dark;
+    const borderRadius = BorderRadius.all(Radius.circular(16));
+
+    // 对标 iOS 官方 Spotlight / App Store 晶体搜索胶囊，纯净通透拒绝发脏发灰
+    final Color searchBgColor = isDark
+        ? const Color(0xFF2C2C2E)
+        : const Color(0xFFF2F2F7);
+    final Color iconAndTextColor = isDark
+        ? const Color(0x99EBEBF5)
+        : const Color(0xFF8E8E93);
+
     return Expanded(
       child: LiquidPressable(
         pressedScale: 0.98,
@@ -157,39 +193,52 @@ class _HomePageState extends CommonPageState<HomePage>
               ? {'hintText': _homeController.defaultSearch.value}
               : null,
         ),
-        child: SizedBox(
+        child: Container(
           height: 42,
-          child: LiquidGlassContainer(
+          decoration: BoxDecoration(
+            color: searchBgColor,
             borderRadius: borderRadius,
-            blur: 20.0,
-            borderWidth: 0.75,
-            glassOpacity: _colorScheme.brightness == Brightness.dark ? 0.35 : 0.45,
-            child: Row(
-              children: [
-                const SizedBox(width: 14),
-                Icon(
-                  Icons.search_outlined,
-                  color: _colorScheme.onSecondaryContainer,
-                  size: 20,
-                  semanticLabel: '搜索',
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Obx(
-                    () => Text(
-                      _homeController.defaultSearch.value,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: _colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
-                        fontSize: 14,
-                      ),
+            border: Border.all(
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.12)
+                  : Colors.black.withValues(alpha: 0.04),
+              width: 0.75,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: isDark ? 0.20 : 0.03),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              const SizedBox(width: 12),
+              Icon(
+                Icons.search_rounded,
+                color: iconAndTextColor,
+                size: 21,
+                semanticLabel: '搜索',
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Obx(
+                  () => Text(
+                    _homeController.defaultSearch.value,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: iconAndTextColor,
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w400,
+                      letterSpacing: 0.1,
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
-              ],
-            ),
+              ),
+              const SizedBox(width: 8),
+            ],
           ),
         ),
       ),

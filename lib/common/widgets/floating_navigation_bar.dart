@@ -76,21 +76,22 @@ class FloatingNavigationBar extends StatelessWidget {
     final padding = MediaQuery.viewPaddingOf(context);
     final double totalWidth = destinations.length * _kIndicatorWidth;
 
-    return Padding(
-      padding: .fromLTRB(
-        padding.left,
-        0,
-        padding.right,
-        bottomPadding + padding.bottom,
-      ),
-      child: Center(
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Padding(
+        padding: .fromLTRB(
+          padding.left,
+          0,
+          padding.right,
+          bottomPadding + padding.bottom,
+        ),
         child: SizedBox(
           height: _kNavigationHeight,
           width: totalWidth,
           child: LiquidGlassContainer(
             borderRadius: _kBorderRadius,
-            blur: 26.0,
-            borderWidth: 0.75,
+            blur: 28.0,
+            borderWidth: 0.8,
             padding: _kIndicatorPadding,
             child: Stack(
               children: [
@@ -711,27 +712,27 @@ class _CurvedAnimationBuilderState extends State<_CurvedAnimationBuilder> {
   }
 }
 
-const _indicatorDark = Color(0x15FFFFFF);
-const _indicatorLight = Color(0x10000000);
+const _indicatorDark = Color(0x33FFFFFF);
+const _indicatorLight = Color(0xFFFFFFFF);
 
 class _NavigationBarDefaultsM3 extends NavigationBarThemeData {
   _NavigationBarDefaultsM3(this.context)
     : super(
         height: _kNavigationHeight,
-        elevation: 3.0,
+        elevation: 0.0,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
       );
 
   final BuildContext context;
   late final _colors = Theme.of(context).colorScheme;
-  late final _textTheme = Theme.of(context).textTheme;
+  late final bool _isDark = Theme.of(context).brightness == Brightness.dark;
 
-  BorderSide get borderSide => _colors.isDark
-      ? const BorderSide(color: Color(0x08FFFFFF))
-      : const BorderSide(color: Color(0x08000000));
+  BorderSide get borderSide => _isDark
+      ? const BorderSide(color: Color(0x26FFFFFF), width: 0.8)
+      : const BorderSide(color: Color(0x80FFFFFF), width: 0.8);
 
   @override
-  Color? get backgroundColor => _colors.surfaceContainer;
+  Color? get backgroundColor => Colors.transparent;
 
   @override
   Color? get shadowColor => Colors.transparent;
@@ -742,20 +743,24 @@ class _NavigationBarDefaultsM3 extends NavigationBarThemeData {
   @override
   WidgetStateProperty<IconThemeData?>? get iconTheme {
     return WidgetStateProperty.resolveWith((Set<WidgetState> states) {
+      final bool selected = states.contains(WidgetState.selected);
+      final Color activeColor = _isDark ? Colors.white : Colors.black;
+      final Color inactiveColor = _isDark ? const Color(0x99EBEBF5) : const Color(0xFF8E8E93);
+
       return IconThemeData(
-        size: 24.0,
+        size: 23.0,
         color: states.contains(WidgetState.disabled)
             ? _colors.onSurfaceVariant.withValues(alpha: 0.38)
-            : states.contains(WidgetState.selected)
-            ? _colors.onSecondaryContainer
-            : _colors.onSurfaceVariant,
+            : selected
+            ? activeColor
+            : inactiveColor,
       );
     });
   }
 
   @override
   Color? get indicatorColor =>
-      _colors.isDark ? _indicatorDark : _indicatorLight;
+      _isDark ? _indicatorDark : _indicatorLight;
 
   @override
   ShapeBorder? get indicatorShape => const StadiumBorder();
@@ -763,13 +768,19 @@ class _NavigationBarDefaultsM3 extends NavigationBarThemeData {
   @override
   WidgetStateProperty<TextStyle?>? get labelTextStyle {
     return WidgetStateProperty.resolveWith((Set<WidgetState> states) {
-      final TextStyle style = _textTheme.labelMedium!;
-      return style.apply(
+      final bool selected = states.contains(WidgetState.selected);
+      final Color activeColor = _isDark ? Colors.white : Colors.black;
+      final Color inactiveColor = _isDark ? const Color(0x99EBEBF5) : const Color(0xFF8E8E93);
+
+      return TextStyle(
+        fontSize: 12.0,
+        letterSpacing: 0.1,
+        fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
         color: states.contains(WidgetState.disabled)
             ? _colors.onSurfaceVariant.withValues(alpha: 0.38)
-            : states.contains(WidgetState.selected)
-            ? _colors.onSurface
-            : _colors.onSurfaceVariant,
+            : selected
+            ? activeColor
+            : inactiveColor,
       );
     });
   }

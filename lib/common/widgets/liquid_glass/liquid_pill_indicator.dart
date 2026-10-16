@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 
 /// 苹果 iOS 26/27 液态流动指示器（Fluid Pill Indicator）
 ///
-/// 当在不同项之间切换时，指示器呈现如水银、水滴般连贯流动的物理形变效果：
+/// 特性：
 /// 1. 采用带弹性阻尼与物理动量的弹簧曲线；
-/// 2. 在移动过程中带有轻微的粘滞拉伸和弹性回弹（Elastic liquid deformation）；
-/// 3. 静止时立即休眠，不产生额外计算损耗。
+/// 2. 浅色模式下呈现纯白浮雕晶体胶囊（高对比度，浮于玻璃之上）；
+/// 3. 深色模式下呈现高透晶白胶囊；
+/// 4. 移动过程中带有流体粘滞拉伸和弹性回弹（Fluid stretch & bounce）。
 class LiquidPillIndicator extends StatelessWidget {
   const LiquidPillIndicator({
     super.key,
@@ -16,7 +17,7 @@ class LiquidPillIndicator extends StatelessWidget {
     required this.indicatorHeight,
     this.color,
     this.borderRadius,
-    this.animationDuration = const Duration(milliseconds: 380),
+    this.animationDuration = const Duration(milliseconds: 360),
     this.curve = Curves.easeOutBack,
   });
 
@@ -34,10 +35,11 @@ class LiquidPillIndicator extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
+    // 浅色模式采用纯白浮雕卡片（对标 iOS 控制中心/Dock），深色模式采用晶白半透
     final Color effectiveColor = color ??
         (isDark
-            ? Colors.white.withValues(alpha: 0.14)
-            : Colors.black.withValues(alpha: 0.08));
+            ? Colors.white.withValues(alpha: 0.22)
+            : Colors.white);
 
     final BorderRadius effectiveRadius = (borderRadius as BorderRadius?) ??
         BorderRadius.circular(indicatorHeight / 2);
@@ -47,9 +49,8 @@ class LiquidPillIndicator extends StatelessWidget {
       duration: animationDuration,
       curve: curve,
       builder: (context, animValue, child) {
-        // 计算流动过程中的液态拉伸形变
         final double delta = (selectedIndex.toDouble() - animValue).abs();
-        final double stretchFactor = 1.0 + math.sin(delta * math.pi) * 0.12;
+        final double stretchFactor = 1.0 + math.sin(delta * math.pi) * 0.10;
 
         final double currentLeft = animValue * itemWidth;
 
@@ -64,17 +65,18 @@ class LiquidPillIndicator extends StatelessWidget {
               borderRadius: effectiveRadius,
               border: Border.all(
                 color: (isDark ? Colors.white : Colors.black).withValues(
-                  alpha: isDark ? 0.08 : 0.04,
+                  alpha: isDark ? 0.15 : 0.04,
                 ),
                 width: 0.5,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: (isDark ? Colors.black : Colors.black12).withValues(
-                    alpha: isDark ? 0.25 : 0.05,
-                  ),
-                  blurRadius: 10,
+                  color: isDark
+                      ? Colors.black.withValues(alpha: 0.35)
+                      : Colors.black.withValues(alpha: 0.08),
+                  blurRadius: 8,
                   offset: const Offset(0, 3),
+                  spreadRadius: -1,
                 ),
               ],
             ),

@@ -1,5 +1,6 @@
 import 'package:PiliPlus/common/style.dart';
 import 'package:PiliPlus/common/widgets/badge.dart';
+import 'package:PiliPlus/common/widgets/liquid_glass/liquid_glass.dart';
 import 'package:PiliPlus/common/widgets/image/image_save.dart';
 import 'package:PiliPlus/common/widgets/image/network_img_layer.dart';
 import 'package:PiliPlus/common/widgets/progress_bar/video_progress_indicator.dart';
@@ -42,9 +43,9 @@ class VideoCardH extends StatelessWidget {
       child: Stack(
         clipBehavior: .none,
         children: [
-          InkWell(
+          LiquidPressable(
+            pressedScale: 0.97,
             onLongPress: onLongPress,
-            onSecondaryTap: PlatformUtils.isMobile ? null : onLongPress,
             onTap: onTap ?? () => pushVideoH(videoItem),
             child: Padding(
               padding: const .symmetric(

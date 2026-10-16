@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:PiliPlus/models/common/badge_type.dart';
 import 'package:PiliPlus/utils/extension/string_ext.dart';
 import 'package:PiliPlus/utils/extension/theme_ext.dart';
@@ -47,17 +48,21 @@ class PBadge extends StatelessWidget {
     Color bgColor;
     Color color;
     Color borderColor = Colors.transparent;
+    bool isGlass = false;
 
     switch (type) {
       case PBadgeType.primary:
         bgColor = theme.primary;
         color = theme.onPrimary;
       case PBadgeType.secondary:
-        bgColor = theme.secondaryContainer.withValues(alpha: 0.5);
+        bgColor = theme.secondaryContainer.withValues(alpha: 0.85);
         color = theme.onSecondaryContainer;
       case PBadgeType.gray:
-        bgColor = Colors.black45;
+        // 苹果 iOS / visionOS 风格微晶液态玻璃胶囊
+        isGlass = true;
+        bgColor = const Color(0x99000000);
         color = Colors.white;
+        borderColor = Colors.white.withValues(alpha: 0.22);
       case PBadgeType.error:
         if (theme.isDark) {
           bgColor = theme.errorContainer;
@@ -82,17 +87,26 @@ class PBadge extends StatelessWidget {
         color = theme.onSurfaceVariant;
     }
 
-    late EdgeInsets paddingStyle = const .symmetric(vertical: 2, horizontal: 3);
+    late EdgeInsets paddingStyle = const EdgeInsets.symmetric(vertical: 2.5, horizontal: 5.5);
     final BorderRadius br = size == .small
-        ? const .all(.circular(3))
-        : const .all(.circular(4));
+        ? const BorderRadius.all(Radius.circular(6))
+        : const BorderRadius.all(Radius.circular(8));
 
     Widget content = Container(
       padding: padding ?? paddingStyle,
       decoration: BoxDecoration(
         borderRadius: br,
         color: bgColor,
-        border: .all(color: borderColor),
+        border: Border.all(color: borderColor, width: 0.55),
+        boxShadow: isGlass
+            ? [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.25),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ]
+            : null,
       ),
       child: Text(
         text!,
@@ -101,16 +115,28 @@ class PBadge extends StatelessWidget {
           height: 1,
           fontSize: fontSize,
           color: color,
-          fontWeight: isBold ? FontWeight.bold : null,
+          fontWeight: isBold ? FontWeight.w600 : null,
+          letterSpacing: 0.2,
         ),
         strutStyle: StrutStyle(
           leading: 0,
           height: 1,
           fontSize: fontSize,
-          fontWeight: isBold ? FontWeight.bold : null,
+          fontWeight: isBold ? FontWeight.w600 : null,
         ),
       ),
     );
+
+    if (isGlass) {
+      content = ClipRRect(
+        borderRadius: br,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+          child: content,
+        ),
+      );
+    }
+
     if (isStack) {
       return Positioned(
         top: top,

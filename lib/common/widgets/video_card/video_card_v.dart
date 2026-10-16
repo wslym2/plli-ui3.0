@@ -1,5 +1,6 @@
 import 'package:PiliPlus/common/style.dart';
 import 'package:PiliPlus/common/widgets/badge.dart';
+import 'package:PiliPlus/common/widgets/liquid_glass/liquid_glass.dart';
 import 'package:PiliPlus/common/widgets/image/image_save.dart';
 import 'package:PiliPlus/common/widgets/image/network_img_layer.dart';
 import 'package:PiliPlus/common/widgets/stat/stat.dart';
@@ -86,15 +87,29 @@ class VideoCardV extends StatelessWidget {
       cover: videoItem.cover,
       bvid: videoItem.bvid,
     );
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    const cardRadius = BorderRadius.all(Radius.circular(14));
+
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        Card(
-          child: InkWell(
-            onTap: onPushDetail,
-            onLongPress: onLongPress,
-            onSecondaryTap: PlatformUtils.isMobile ? null : onLongPress,
-            borderRadius: const .all(.circular(12)),
+        LiquidPressable(
+          pressedScale: 0.965,
+          borderRadius: cardRadius,
+          onTap: onPushDetail,
+          onLongPress: onLongPress,
+          child: Card(
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: cardRadius,
+              side: BorderSide(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.08)
+                    : Colors.black.withValues(alpha: 0.04),
+                width: 0.6,
+              ),
+            ),
             child: Column(
               crossAxisAlignment: .start,
               children: [
@@ -111,7 +126,7 @@ class VideoCardV extends StatelessWidget {
                             src: videoItem.cover,
                             width: maxWidth,
                             height: maxHeight,
-                            borderRadius: const .vertical(top: .circular(12)),
+                            borderRadius: const .vertical(top: .circular(14)),
                           ),
                           if (videoItem.duration > 0)
                             PBadge(

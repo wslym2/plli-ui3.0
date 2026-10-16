@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-/// 苹果 iOS 26/27 液态物理按压反馈组件
+/// Kyant0 风格的果冻弹性流体按压反馈 (Jelly Spring Damped Pressable)
 ///
 /// 特性：
-/// 1. 采用带弹簧阻尼（Spring-damping）的高精度物理动画曲线；
-/// 2. 按压时产生微妙的流体压缩形变（0.96 缩放）与液体微光高光扩散；
-/// 3. 松手时瞬间弹性复原，丝滑跟手；
-/// 4. “动时满血，静时休眠”：动画结束后立即停用动画引擎，功耗极低。
+/// 1. 按压时产生流体物理形变（Y 轴微压扁 0.95，X 轴轻微横向扩张 1.015）；
+/// 2. 松手时带有弹簧阻尼回弹（Curves.easeOutBack）；
+/// 3. 伴随水波微光涟漪扩散；
+/// 4. 动时满血，静时休眠（交互停止后立即休眠，零额外能耗）。
 class LiquidPressable extends StatefulWidget {
   const LiquidPressable({
     super.key,
@@ -14,6 +14,7 @@ class LiquidPressable extends StatefulWidget {
     this.onTap,
     this.onLongPress,
     this.pressedScale = 0.955,
+    this.enableJellyDeformation = true,
     this.enableSheen = true,
     this.borderRadius = const BorderRadius.all(Radius.circular(16)),
     this.behavior = HitTestBehavior.opaque,
@@ -23,6 +24,7 @@ class LiquidPressable extends StatefulWidget {
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final double pressedScale;
+  final bool enableJellyDeformation;
   final bool enableSheen;
   final BorderRadiusGeometry borderRadius;
   final HitTestBehavior behavior;
@@ -34,7 +36,8 @@ class LiquidPressable extends StatefulWidget {
 class _LiquidPressableState extends State<LiquidPressable>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  late final Animation<double> _scaleAnimation;
+  late final Animation<double> _scaleYAnimation;
+  late final Animation<double> _scaleXAnimation;
   late final Animation<double> _sheenAnimation;
 
   @override
@@ -42,14 +45,25 @@ class _LiquidPressableState extends State<LiquidPressable>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 140),
-      reverseDuration: const Duration(milliseconds: 260),
+      duration: const Duration(milliseconds: 130),
+      reverseDuration: const Duration(milliseconds: 280),
     );
 
-    // 按下时快速阻尼压缩，回弹时带有苹果特有的微弹回弹（Curves.easeOutBack）
-    _scaleAnimation = Tween<double>(
+    // 果冻流体物理形变
+    _scaleYAnimation = Tween<double>(
       begin: 1.0,
       end: widget.pressedScale,
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeOutQuad,
+        reverseCurve: Curves.easeOutBack,
+      ),
+    );
+
+    _scaleXAnimation = Tween<double>(
+      begin: 1.0,
+      end: widget.enableJellyDeformation ? 1.0 + (1.0 - widget.pressedScale) * 0.35 : widget.pressedScale,
     ).animate(
       CurvedAnimation(
         parent: _controller,
@@ -108,7 +122,8 @@ class _LiquidPressableState extends State<LiquidPressable>
       child: AnimatedBuilder(
         animation: _controller,
         builder: (context, child) {
-          final scale = _scaleAnimation.value;
+          final scaleY = _scaleYAnimation.value;
+          final scaleX = _scaleXAnimation.value;
           final sheenOpacity = _sheenAnimation.value;
 
           Widget content = child!;
@@ -127,12 +142,10 @@ class _LiquidPressableState extends State<LiquidPressable>
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                             colors: [
-                              (isDark ? Colors.white : Colors.black).withValues(
-                                alpha: (isDark ? 0.10 : 0.04) * sheenOpacity,
+                              (isDark ? const Color(0x3380D8FF) : const Color(0x4D80E5FF)).withValues(
+                                alpha: (isDark ? 0.12 : 0.06) * sheenOpacity,
                               ),
-                              (isDark ? Colors.white : Colors.black).withValues(
-                                alpha: (isDark ? 0.03 : 0.01) * sheenOpacity,
-                              ),
+                              Colors.transparent,
                             ],
                           ),
                         ),
@@ -144,9 +157,9 @@ class _LiquidPressableState extends State<LiquidPressable>
             );
           }
 
-          return Transform.scale(
-            scale: scale,
+          return Transform(
             alignment: Alignment.center,
+            transform: Matrix4.diagonal3Values(scaleX, scaleY, 1.0),
             child: content,
           );
         },
