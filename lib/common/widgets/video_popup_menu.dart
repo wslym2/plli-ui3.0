@@ -39,8 +39,20 @@ class VideoPopupMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return PopupMenuButton(
       padding: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(
+        borderRadius: const BorderRadius.all(Radius.circular(20)),
+        side: BorderSide(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.14)
+              : Colors.black.withValues(alpha: 0.08),
+          width: 0.7,
+        ),
+      ),
+      elevation: 16,
+      shadowColor: Colors.black.withValues(alpha: isDark ? 0.45 : 0.12),
       icon: Icon(
         Icons.more_vert_outlined,
         color: Theme.of(context).colorScheme.outline,

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:PiliPlus/common/style.dart';
 import 'package:PiliPlus/common/widgets/floating_navigation_bar.dart';
+import 'package:PiliPlus/common/widgets/liquid_glass/liquid_glass.dart';
 import 'package:PiliPlus/common/widgets/flutter/pop_scope.dart';
 import 'package:PiliPlus/common/widgets/image/network_img_layer.dart';
 import 'package:PiliPlus/common/widgets/main_layout.dart';
@@ -171,39 +172,52 @@ class _MainAppState extends PopScopeState<MainApp>
         );
       } else if (_mainController.enableMYBar) {
         bottomNav = Obx(
-          () => NavigationBar(
-            maintainBottomViewPadding: true,
-            onDestinationSelected: _mainController.setIndex,
-            selectedIndex: _mainController.selectedIndex.value,
-            destinations: _mainController.navigationBars
-                .map(
-                  (e) => NavigationDestination(
-                    label: e.label,
-                    icon: _buildIcon(type: e),
-                    selectedIcon: _buildIcon(type: e, selected: true),
-                  ),
-                )
-                .toList(),
+          () => LiquidGlassContainer(
+            borderRadius: BorderRadius.zero,
+            showBorder: true,
+            blur: 24,
+            child: NavigationBar(
+              backgroundColor: Colors.transparent,
+              maintainBottomViewPadding: true,
+              onDestinationSelected: _mainController.setIndex,
+              selectedIndex: _mainController.selectedIndex.value,
+              destinations: _mainController.navigationBars
+                  .map(
+                    (e) => NavigationDestination(
+                      label: e.label,
+                      icon: _buildIcon(type: e),
+                      selectedIcon: _buildIcon(type: e, selected: true),
+                    ),
+                  )
+                  .toList(),
+            ),
           ),
         );
       } else {
         bottomNav = Obx(
-          () => BottomNavigationBar(
-            currentIndex: _mainController.selectedIndex.value,
-            onTap: _mainController.setIndex,
-            iconSize: 16,
-            selectedFontSize: 12,
-            unselectedFontSize: 12,
-            type: .fixed,
-            items: _mainController.navigationBars
-                .map(
-                  (e) => BottomNavigationBarItem(
-                    label: e.label,
-                    icon: _buildIcon(type: e),
-                    activeIcon: _buildIcon(type: e, selected: true),
-                  ),
-                )
-                .toList(),
+          () => LiquidGlassContainer(
+            borderRadius: BorderRadius.zero,
+            showBorder: true,
+            blur: 24,
+            child: BottomNavigationBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              currentIndex: _mainController.selectedIndex.value,
+              onTap: _mainController.setIndex,
+              iconSize: 16,
+              selectedFontSize: 12,
+              unselectedFontSize: 12,
+              type: .fixed,
+              items: _mainController.navigationBars
+                  .map(
+                    (e) => BottomNavigationBarItem(
+                      label: e.label,
+                      icon: _buildIcon(type: e),
+                      activeIcon: _buildIcon(type: e, selected: true),
+                    ),
+                  )
+                  .toList(),
+            ),
           ),
         );
       }
@@ -223,8 +237,8 @@ class _MainAppState extends PopScopeState<MainApp>
         if (_mainController.showBottomBar case final showBottomBar?) {
           return Obx(
             () => AnimatedSlide(
-              curve: Curves.easeInOutCubicEmphasized,
-              duration: const Duration(milliseconds: 500),
+              curve: Curves.easeOutBack,
+              duration: const Duration(milliseconds: 400),
               offset: Offset(0, showBottomBar.value ? 0 : 1),
               child: bottomNav,
             ),
@@ -241,35 +255,39 @@ class _MainAppState extends PopScopeState<MainApp>
       if (context.isTablet && _mainController.optTabletNav) {
         return Padding(
           padding: const .only(top: 25),
-          child: MediaQuery.removePadding(
-            context: context,
-            removeRight: true,
-            child: DrawerTheme(
-              data: DrawerThemeData(width: 130 + _padding.left),
-              child: Obx(
-                () => NavigationDrawer(
-                  /// apply `lib/scripts/navigation_drawer.patch`
-                  flex: 5,
-                  backgroundColor: Colors.transparent,
-                  onDestinationSelected: _mainController.setIndex,
-                  selectedIndex: _mainController.selectedIndex.value,
-                  header: Expanded(flex: 4, child: userAndSearchVertical()),
-                  tilePadding: const .symmetric(vertical: 5, horizontal: 12),
-                  indicatorShape: const RoundedRectangleBorder(
-                    borderRadius: .all(.circular(16)),
-                  ),
-                  children: _mainController.navigationBars
-                      .map(
-                        (e) => NavigationDrawerDestination(
-                          label: Text(e.label),
-                          icon: _buildIcon(type: e),
-                          selectedIcon: _buildIcon(
-                            type: e,
-                            selected: true,
+          child: LiquidGlassContainer(
+            borderRadius: const BorderRadius.horizontal(right: Radius.circular(24)),
+            blur: 24,
+            child: MediaQuery.removePadding(
+              context: context,
+              removeRight: true,
+              child: DrawerTheme(
+                data: DrawerThemeData(width: 130 + _padding.left),
+                child: Obx(
+                  () => NavigationDrawer(
+                    /// apply `lib/scripts/navigation_drawer.patch`
+                    flex: 5,
+                    backgroundColor: Colors.transparent,
+                    onDestinationSelected: _mainController.setIndex,
+                    selectedIndex: _mainController.selectedIndex.value,
+                    header: Expanded(flex: 4, child: userAndSearchVertical()),
+                    tilePadding: const .symmetric(vertical: 5, horizontal: 12),
+                    indicatorShape: const RoundedRectangleBorder(
+                      borderRadius: .all(.circular(16)),
+                    ),
+                    children: _mainController.navigationBars
+                        .map(
+                          (e) => NavigationDrawerDestination(
+                            label: Text(e.label),
+                            icon: _buildIcon(type: e),
+                            selectedIcon: _buildIcon(
+                              type: e,
+                              selected: true,
+                            ),
                           ),
-                        ),
-                      )
-                      .toList(),
+                        )
+                        .toList(),
+                  ),
                 ),
               ),
             ),
@@ -277,22 +295,26 @@ class _MainAppState extends PopScopeState<MainApp>
         );
       }
       return Obx(
-        () => NavigationRail(
-          groupAlignment: 0.5,
-          labelType: .selected,
-          leading: userAndSearchVertical(),
-          backgroundColor: Colors.transparent,
-          onDestinationSelected: _mainController.setIndex,
-          selectedIndex: _mainController.selectedIndex.value,
-          destinations: _mainController.navigationBars
-              .map(
-                (e) => NavigationRailDestination(
-                  label: Text(e.label),
-                  icon: _buildIcon(type: e),
-                  selectedIcon: _buildIcon(type: e, selected: true),
-                ),
-              )
-              .toList(),
+        () => LiquidGlassContainer(
+          borderRadius: const BorderRadius.horizontal(right: Radius.circular(24)),
+          blur: 24,
+          child: NavigationRail(
+            groupAlignment: 0.5,
+            labelType: .selected,
+            leading: userAndSearchVertical(),
+            backgroundColor: Colors.transparent,
+            onDestinationSelected: _mainController.setIndex,
+            selectedIndex: _mainController.selectedIndex.value,
+            destinations: _mainController.navigationBars
+                .map(
+                  (e) => NavigationRailDestination(
+                    label: Text(e.label),
+                    icon: _buildIcon(type: e),
+                    selectedIcon: _buildIcon(type: e, selected: true),
+                  ),
+                )
+                .toList(),
+          ),
         ),
       );
     }

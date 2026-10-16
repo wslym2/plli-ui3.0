@@ -1,5 +1,6 @@
 import 'package:PiliPlus/common/style.dart';
 import 'package:PiliPlus/common/widgets/custom_height_widget.dart';
+import 'package:PiliPlus/common/widgets/liquid_glass/liquid_glass.dart';
 import 'package:PiliPlus/common/widgets/image/network_img_layer.dart';
 import 'package:PiliPlus/common/widgets/scroll_physics.dart' show tabBarView;
 import 'package:PiliPlus/pages/common/common_page.dart';
@@ -145,30 +146,31 @@ class _HomePageState extends CommonPageState<HomePage>
   }
 
   Widget searchBar() {
-    const borderRadius = BorderRadius.all(Radius.circular(25));
+    const borderRadius = BorderRadius.all(Radius.circular(22));
     return Expanded(
-      child: SizedBox(
-        height: 44,
-        child: Material(
-          borderRadius: borderRadius,
-          color: _colorScheme.onSecondaryContainer.withValues(alpha: 0.05),
-          child: InkWell(
+      child: LiquidPressable(
+        pressedScale: 0.98,
+        borderRadius: borderRadius,
+        onTap: () => Get.toNamed(
+          '/search',
+          parameters: _homeController.enableSearchWord
+              ? {'hintText': _homeController.defaultSearch.value}
+              : null,
+        ),
+        child: SizedBox(
+          height: 42,
+          child: LiquidGlassContainer(
             borderRadius: borderRadius,
-            splashColor: _colorScheme.primaryContainer.withValues(
-              alpha: 0.3,
-            ),
-            onTap: () => Get.toNamed(
-              '/search',
-              parameters: _homeController.enableSearchWord
-                  ? {'hintText': _homeController.defaultSearch.value}
-                  : null,
-            ),
+            blur: 20.0,
+            borderWidth: 0.75,
+            glassOpacity: _colorScheme.brightness == Brightness.dark ? 0.35 : 0.45,
             child: Row(
               children: [
                 const SizedBox(width: 14),
                 Icon(
                   Icons.search_outlined,
                   color: _colorScheme.onSecondaryContainer,
+                  size: 20,
                   semanticLabel: '搜索',
                 ),
                 const SizedBox(width: 10),
@@ -178,11 +180,14 @@ class _HomePageState extends CommonPageState<HomePage>
                       _homeController.defaultSearch.value,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(color: _colorScheme.outline),
+                      style: TextStyle(
+                        color: _colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+                        fontSize: 14,
+                      ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 5),
+                const SizedBox(width: 8),
               ],
             ),
           ),
@@ -201,27 +206,18 @@ Widget userAvatar({
     child: Obx(
       () {
         if (mainController.accountService.isLogin.value) {
-          return Stack(
-            clipBehavior: .none,
-            children: [
-              NetworkImgLayer(
-                type: .avatar,
-                width: 34,
-                height: 34,
-                src: mainController.accountService.face.value,
-              ),
-              Positioned.fill(
-                child: Material(
-                  type: .transparency,
-                  child: InkWell(
-                    onTap: mainController.toMinePage,
-                    splashColor: colorScheme.primaryContainer.withValues(
-                      alpha: 0.3,
-                    ),
-                    customBorder: const CircleBorder(),
-                  ),
+          return LiquidPressable(
+            pressedScale: 0.90,
+            onTap: mainController.toMinePage,
+            child: Stack(
+              clipBehavior: .none,
+              children: [
+                NetworkImgLayer(
+                  type: .avatar,
+                  width: 34,
+                  height: 34,
+                  src: mainController.accountService.face.value,
                 ),
-              ),
               Positioned(
                 right: -4,
                 bottom: -4,
@@ -245,9 +241,13 @@ Widget userAvatar({
                 ),
               ),
             ],
-          );
-        }
-        return SizedBox(
+          ),
+        );
+      }
+      return LiquidPressable(
+        pressedScale: 0.92,
+        onTap: mainController.toMinePage,
+        child: SizedBox(
           width: 38,
           height: 38,
           child: IconButton(
@@ -263,7 +263,8 @@ Widget userAvatar({
               color: colorScheme.primary,
             ),
           ),
-        );
+        ),
+      );
       },
     ),
   );
@@ -275,22 +276,25 @@ Widget msgBadge(MainController mainController) {
       if (mainController.accountService.isLogin.value) {
         final count = mainController.msgUnReadCount.value;
         final isNumBadge = mainController.msgBadgeMode == .number;
-        return IconButton(
-          tooltip: '消息',
-          onPressed: () {
-            mainController
-              ..clearUnreadMsg()
-              ..lastCheckUnreadAt = DateTime.now().millisecondsSinceEpoch;
-            Get.toNamed('/whisper');
-          },
-          icon: Badge(
-            isLabelVisible:
-                mainController.msgBadgeMode != .hidden && count != null,
-            alignment: isNumBadge
-                ? const Alignment(0.0, -0.85)
-                : const Alignment(1.0, -0.85),
-            label: isNumBadge && count != null ? Text(count) : null,
-            child: const Icon(Icons.notifications_none),
+        return LiquidPressable(
+          pressedScale: 0.90,
+          child: IconButton(
+            tooltip: '消息',
+            onPressed: () {
+              mainController
+                ..clearUnreadMsg()
+                ..lastCheckUnreadAt = DateTime.now().millisecondsSinceEpoch;
+              Get.toNamed('/whisper');
+            },
+            icon: Badge(
+              isLabelVisible:
+                  mainController.msgBadgeMode != .hidden && count != null,
+              alignment: isNumBadge
+                  ? const Alignment(0.0, -0.85)
+                  : const Alignment(1.0, -0.85),
+              label: isNumBadge && count != null ? Text(count) : null,
+              child: const Icon(Icons.notifications_none),
+            ),
           ),
         );
       }

@@ -1,4 +1,5 @@
 import 'package:PiliPlus/common/style.dart';
+import 'package:PiliPlus/common/widgets/liquid_glass/liquid_glass.dart';
 import 'package:PiliPlus/utils/extension/theme_ext.dart';
 import 'package:PiliPlus/utils/font_utils.dart';
 import 'package:PiliPlus/utils/storage_pref.dart';
@@ -96,6 +97,9 @@ abstract final class ThemeUtils {
         elevation: 1,
         margin: EdgeInsets.zero,
         shadowColor: Colors.transparent,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(16)),
+        ),
         surfaceTintColor: isDark ? colorScheme.onSurfaceVariant : null,
       ),
       progressIndicatorTheme: isDark
@@ -113,13 +117,15 @@ abstract final class ThemeUtils {
           fontFamily: fontFamily,
           color: colorScheme.onSurface,
         ),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(24)),
+        ),
         backgroundColor: colorScheme.surface,
         constraints: const BoxConstraints(minWidth: 280, maxWidth: 420),
       ),
-      bottomSheetTheme: BottomSheetThemeData(
-        backgroundColor: colorScheme.surface,
-        shape: const RoundedRectangleBorder(
-          borderRadius: Style.bottomSheetRadius,
+      bottomSheetTheme: const BottomSheetThemeData(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(26)),
         ),
       ),
       // ignore: deprecated_member_use
@@ -161,7 +167,11 @@ abstract final class ThemeUtils {
       ),
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: {
-          TargetPlatform.android: ZoomPageTransitionsBuilder(),
+          TargetPlatform.android: LiquidSpringPageTransitionsBuilder(),
+          TargetPlatform.iOS: LiquidSpringPageTransitionsBuilder(),
+          TargetPlatform.macOS: LiquidSpringPageTransitionsBuilder(),
+          TargetPlatform.windows: LiquidSpringPageTransitionsBuilder(),
+          TargetPlatform.linux: LiquidSpringPageTransitionsBuilder(),
         },
       ),
     );

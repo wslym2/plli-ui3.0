@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:PiliPlus/common/widgets/liquid_glass/liquid_glass.dart';
 import 'package:PiliPlus/utils/extension/theme_ext.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -73,6 +74,7 @@ class FloatingNavigationBar extends StatelessWidget {
         defaults.labelBehavior!;
 
     final padding = MediaQuery.viewPaddingOf(context);
+    final double totalWidth = destinations.length * _kIndicatorWidth;
 
     return Padding(
       padding: .fromLTRB(
@@ -81,53 +83,56 @@ class FloatingNavigationBar extends StatelessWidget {
         padding.right,
         bottomPadding + padding.bottom,
       ),
-      child: SizedBox(
-        height: _kNavigationHeight,
-        width: destinations.length * _kIndicatorWidth,
-        child: DecoratedBox(
-          decoration: ShapeDecoration(
-            color: ElevationOverlay.applySurfaceTint(
-              backgroundColor ??
-                  navigationBarTheme.backgroundColor ??
-                  defaults.backgroundColor!,
-              surfaceTintColor ??
-                  navigationBarTheme.surfaceTintColor ??
-                  defaults.surfaceTintColor,
-              elevation ?? navigationBarTheme.elevation ?? defaults.elevation!,
-            ),
-            shape: RoundedSuperellipseBorder(
-              side: defaults.borderSide,
-              borderRadius: _kBorderRadius,
-            ),
-          ),
-          child: Padding(
+      child: Center(
+        child: SizedBox(
+          height: _kNavigationHeight,
+          width: totalWidth,
+          child: LiquidGlassContainer(
+            borderRadius: _kBorderRadius,
+            blur: 26.0,
+            borderWidth: 0.75,
             padding: _kIndicatorPadding,
-            child: Row(
-              crossAxisAlignment: .stretch,
-              children: <Widget>[
-                for (int i = 0; i < destinations.length; i++)
-                  Expanded(
-                    child: _SelectableAnimatedBuilder(
-                      duration: animationDuration,
-                      isSelected: i == selectedIndex,
-                      builder: (context, animation) {
-                        return _NavigationDestinationInfo(
-                          index: i,
-                          selectedIndex: selectedIndex,
-                          totalNumberOfDestinations: destinations.length,
-                          selectedAnimation: animation,
-                          labelBehavior: effectiveLabelBehavior,
-                          indicatorColor: indicatorColor,
-                          indicatorShape: indicatorShape,
-                          overlayColor: overlayColor,
-                          onTap: _handleTap(i),
-                          labelTextStyle: labelTextStyle,
-                          labelPadding: labelPadding,
-                          child: destinations[i],
-                        );
-                      },
-                    ),
-                  ),
+            child: Stack(
+              children: [
+                // 液态流体气泡跟随指示器（粘滞拉伸与弹簧动量）
+                LiquidPillIndicator(
+                  selectedIndex: selectedIndex,
+                  itemCount: destinations.length,
+                  itemWidth: _kIndicatorWidth - (_kIndicatorPaddingInt * 2 / destinations.length),
+                  indicatorHeight: _kIndicatorHeight,
+                  animationDuration: animationDuration,
+                  color: indicatorColor ??
+                      navigationBarTheme.indicatorColor ??
+                      defaults.indicatorColor,
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    for (int i = 0; i < destinations.length; i++)
+                      Expanded(
+                        child: _SelectableAnimatedBuilder(
+                          duration: animationDuration,
+                          isSelected: i == selectedIndex,
+                          builder: (context, animation) {
+                            return _NavigationDestinationInfo(
+                              index: i,
+                              selectedIndex: selectedIndex,
+                              totalNumberOfDestinations: destinations.length,
+                              selectedAnimation: animation,
+                              labelBehavior: effectiveLabelBehavior,
+                              indicatorColor: Colors.transparent,
+                              indicatorShape: indicatorShape,
+                              overlayColor: overlayColor,
+                              onTap: _handleTap(i),
+                              labelTextStyle: labelTextStyle,
+                              labelPadding: labelPadding,
+                              child: destinations[i],
+                            );
+                          },
+                        ),
+                      ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -281,9 +286,10 @@ class _NavigationDestinationBuilderState
   Widget build(BuildContext context) {
     final info = _NavigationDestinationInfo.of(context);
 
-    final child = GestureDetector(
-      behavior: .opaque,
+    final child = LiquidPressable(
+      behavior: HitTestBehavior.opaque,
       onTap: widget.enabled ? info.onTap : null,
+      pressedScale: 0.92,
       child: _NavigationBarDestinationLayout(
         icon: widget.buildIcon(context),
         iconKey: iconKey,

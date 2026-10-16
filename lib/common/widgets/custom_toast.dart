@@ -1,3 +1,4 @@
+import 'package:PiliPlus/common/widgets/liquid_glass/liquid_glass.dart';
 import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -11,20 +12,34 @@ class CustomToast extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = ColorScheme.of(context);
-    return Container(
-      margin: .only(
-        bottom: MediaQuery.viewPaddingOf(context).bottom + 30,
+    final isDark = colorScheme.brightness == Brightness.dark;
+
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.viewPaddingOf(context).bottom + 36,
       ),
-      padding: const .symmetric(horizontal: 17, vertical: 10),
-      decoration: BoxDecoration(
-        color: colorScheme.primaryContainer.withValues(alpha: toastOpacity),
-        borderRadius: const .all(.circular(20)),
-      ),
-      child: Text(
-        msg,
-        style: TextStyle(
-          fontSize: 13,
-          color: colorScheme.onPrimaryContainer,
+      child: LiquidGlassContainer(
+        borderRadius: const BorderRadius.all(Radius.circular(24)),
+        blur: 26.0,
+        borderWidth: 0.8,
+        glassOpacity: isDark ? 0.72 : 0.78,
+        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.12),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+        child: Text(
+          msg,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 13.5,
+            fontWeight: FontWeight.w500,
+            color: isDark ? Colors.white : colorScheme.onSurface,
+            letterSpacing: 0.2,
+          ),
         ),
       ),
     );
@@ -40,24 +55,47 @@ class LoadingWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final onSurfaceVariant = theme.colorScheme.onSurfaceVariant;
-    return Container(
-      padding: const .symmetric(horizontal: 30, vertical: 20),
-      decoration: BoxDecoration(
-        color: theme.dialogTheme.backgroundColor,
-        borderRadius: const .all(.circular(15)),
-      ),
+    final colorScheme = theme.colorScheme;
+    final isDark = colorScheme.brightness == Brightness.dark;
+    final onSurfaceVariant = colorScheme.onSurfaceVariant;
+
+    return LiquidGlassContainer(
+      borderRadius: const BorderRadius.all(Radius.circular(26)),
+      blur: 28.0,
+      borderWidth: 0.8,
+      glassOpacity: isDark ? 0.75 : 0.82,
+      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: isDark ? 0.40 : 0.15),
+          blurRadius: 32,
+          offset: const Offset(0, 12),
+        ),
+      ],
       child: Column(
-        spacing: 20,
-        mainAxisSize: .min,
+        spacing: 16,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          //loading animation
-          CircularProgressIndicator(
-            strokeWidth: 3,
-            valueColor: AlwaysStoppedAnimation(onSurfaceVariant),
+          // 优雅精细的加载圆环
+          SizedBox(
+            width: 32,
+            height: 32,
+            child: CircularProgressIndicator(
+              strokeWidth: 2.8,
+              valueColor: AlwaysStoppedAnimation(
+                isDark ? Colors.white : colorScheme.primary,
+              ),
+            ),
           ),
-          //msg
-          Text(msg, style: TextStyle(color: onSurfaceVariant)),
+          // 提示文字
+          Text(
+            msg,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: isDark ? Colors.white70 : onSurfaceVariant,
+            ),
+          ),
         ],
       ),
     );
@@ -72,23 +110,40 @@ class NotifyWarning extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final onSurfaceVariant = theme.colorScheme.onSurfaceVariant;
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: const .all(.circular(8)),
-        color: theme.dialogTheme.backgroundColor,
-      ),
-      padding: const .symmetric(horizontal: 20, vertical: 10),
+    final colorScheme = theme.colorScheme;
+    final isDark = colorScheme.brightness == Brightness.dark;
+    final onSurfaceVariant = colorScheme.onSurfaceVariant;
+
+    return LiquidGlassContainer(
+      borderRadius: const BorderRadius.all(Radius.circular(18)),
+      blur: 24.0,
+      borderWidth: 0.75,
+      glassOpacity: isDark ? 0.75 : 0.80,
+      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: isDark ? 0.30 : 0.10),
+          blurRadius: 20,
+          offset: const Offset(0, 6),
+        ),
+      ],
       child: Column(
-        spacing: 5,
-        mainAxisSize: .min,
+        spacing: 6,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
             Icons.warning_amber_rounded,
-            size: 22,
-            color: onSurfaceVariant,
+            size: 24,
+            color: Colors.amber[700] ?? onSurfaceVariant,
           ),
-          Text(msg, style: TextStyle(color: onSurfaceVariant)),
+          Text(
+            msg,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: isDark ? Colors.white : onSurfaceVariant,
+            ),
+          ),
         ],
       ),
     );
