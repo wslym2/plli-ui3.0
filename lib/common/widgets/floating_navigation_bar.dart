@@ -95,16 +95,13 @@ class FloatingNavigationBar extends StatelessWidget {
             padding: _kIndicatorPadding,
             child: Stack(
               children: [
-                // 液态流体气泡跟随指示器（粘滞拉伸与弹簧动量）
-                LiquidPillIndicator(
+                // 标杆级彩虹色散凸透镜流体水滴指示器（Prism Rainbow Lens Bubble，对标真机参考图）
+                LiquidLensBubble(
                   selectedIndex: selectedIndex,
                   itemCount: destinations.length,
                   itemWidth: _kIndicatorWidth - (_kIndicatorPaddingInt * 2 / destinations.length),
                   indicatorHeight: _kIndicatorHeight,
                   animationDuration: animationDuration,
-                  color: indicatorColor ??
-                      navigationBarTheme.indicatorColor ??
-                      defaults.indicatorColor,
                 ),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
